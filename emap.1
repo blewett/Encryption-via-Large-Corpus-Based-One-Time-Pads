@@ -1,0 +1,427 @@
+.de dT
+.ds Dt \\$2
+..
+.dT Time-stamp: "2020-12-12"
+.\" Update the above date whenever a change to either this file or
+.\" emap.c's 'usage' function results in a nontrivial change to the man page.
+.\" In Emacs, you can update the date by running 'M-x time-stamp'
+.\" after you make a change that you decide is nontrivial.
+.\" It is no big deal to forget to update the date.
+.
+.TH emap 1 \*(Dt "emap" "User Commands"
+.hy 0
+.
+.SH NAME
+emap, eunmap, ecorpus, etally \- corpus based encryption toys
+.
+.SH SYNOPSIS
+.B emap
+.RI [ -start\ N ]
+.I corpusfilename inputfilename outputfilename
+.br
+.B eunmap
+.RI [ -start\ N ]
+.I corpusfilename inputfilename outputfilename
+.br
+.B ecorpus
+.RI [ OPTIONS ]
+.br
+.B etally
+.RI [ OPTIONS ]
+.I inputfilename
+.
+.SH DESCRIPTION
+This is a collection of software tools for performing corpus based encryption.  
+.B emap
+can be used to encrypt files.  Each byte of an
+.I inputfile
+is converted to the
+.I relative index
+of the matching byte in another file.  The file containing the matching bytes
+we call the
+.I corpus file.
+Corpus based encryption and one time pad based encryption
+have been shown to be very strong encryption techniques.
+.PP
+Corpus files can be existing files or files generated specifically for
+encryption.  Naturally occurring corpus files can be the texts of books
+or binaries, including compiled programs.  The corpus file should be
+thought of as a bag of bytes in something approximating a random
+order.  Corpus based encryption has been employed for centuries using
+religious texts.  Ideal corpus files should be huge, random, and kept
+private.  They should also not be reused - create or select a new
+corpus for each encryption task.  Another less secure method is to
+change the starting index into the corpus.  This technique was used
+with ancient texts.
+.PP
+This technique converts source bytes into
+.I relative indices
+in the corpus file.  For example, the letter
+.I A
+may be converted the number
+.I 23
+if the next
+.I A
+in the corpus files is 23 bytes from the current location.  A subsequent
+.I A
+might be converted to
+.I 180
+if the next
+.I A
+is 180 bytes from the current location in the corpus file.
+.PP
+The programs in this group include
+.B emap
+for encrypting a source file,
+.B eunmap
+for decrypting an encrypted file,
+.B ecorpus
+for creating corpus files, and
+.B etally
+for generating statistics from the data in files.
+
+.SH PROGRAM SYNTAX
+\ 
+
+
+
+.TP
+.B 1. emap [ OPTION ] corpusfilename inputfilename outputfilename
+.PP
+.B emap
+maps the bytes in the input file to relative distances as found in the
+corpus file.
+.PP
+.RS
+.B  [ -start\ N ]
+.RS
+.PP
+An optional
+.I -start N
+This specifies that the corpus should be started at the Nth byte
+rather than at zeroth byte.
+.RE
+.RE
+.PP
+.RS
+.B  corpusfilename
+.RS
+.PP
+This specifies the corpus file to be used for encryption.  A corpus
+stream may also be specified as the corpus file.  Corpus streams have the
+format "stream:filename" where the description of the stream will be
+found in the specified file.  See
+.B ecorpus
+below for a list of option flags - one per line.
+.RE
+.PP
+.B  inputfilename
+.RS
+.PP
+This specifies the source file to be encrypted.  The input file can be
+specified as "-" and standard input (STDIN) will be used as the
+source.
+.RE
+.PP
+.B  outputfilename
+.RS
+.PP
+This specifies the output file, that is the name of the encrypted
+output.  The output file can be specified as "-" and standard output
+(STDOUT) will be used for output.
+.RE
+.RE
+
+.TP
+.B 2. eunmap [ OPTION ] corpusfilename inputfilename outputfilename
+.PP
+.B eunmap
+unmaps the encrypted input file which contains a list of relative
+distances to the (unencrypted) bytes in the corpus file.
+.RS
+.PP
+.B  [ -start\ N ]
+.RS
+.PP
+An optional
+.I -start N
+This specifies that the corpus should be started at the Nth byte
+rather than at zeroth byte.
+.RE
+.RE
+.PP
+.RS
+.B  corpusfilename
+.RS
+.PP
+This specifies the corpus file to be used for decryption.  A corpus
+stream may also be specified as the corpus file.  Corpus streams have the
+format "stream:filename" where the description of the stream will be
+found in the specified file.  See
+.B ecorpus
+below for a list of option flags - one per line.
+.RE
+.PP
+.B  inputfilename
+.RS
+.PP
+This specifies the source file to be decrypted.  The input file can be
+specified as "-" and standard input (STDIN) will be used as the
+source.
+.RE
+.PP
+.B  outputfilename
+.RS
+.PP
+This specifies the output file, that is the name of the decrypted
+output.  The output file can be specified as "-" and standard output
+(STDOUT) will be used for output.
+.RE
+.RE
+
+.TP
+.B 3. ecorpus [ OPTIONS ]
+.PP
+.B ecorpus
+creates corpus files.  Corpus files are "bags" of random bytes.  The
+simplest corpus file is a list of random numbers generated directly
+from a random number generator.  This program uses techniques to
+increase randomness and obscure recognizable patterns from known
+generators.  Commonly used techniques simply add discarded calls to
+the random number generator and make the generator patterns difficult
+to detect.
+.PP
+.RS
+.B  [ -corpus\ outputfilename ]
+.RS
+.PP
+This option sets the corpus output filename.
+.RE
+.RE
+.PP
+.RS
+.B  [ -corpus_size\ number ]
+.RS
+.PP
+This option sets the size of the file to be created in bytes.
+.RE
+.RE
+.PP
+.RS
+.B  [ -uniform ]
+.RS
+.PP
+This option sets byte values per block to be uniform and random.  A
+block is a set of random numbers which covers all of the possible
+values for each byte.  This option greatly reduces encrypted file
+sizes as most distances are less than 255 bytes.
+.RE
+.RE
+.PP
+.RS
+.B  [ -key\ number ]
+.RS
+.PP
+This option sets the randomizing seed key.  The key determines the
+list of random number that will be generated.  Specifying the same key
+will result in the identical list of random numbers.  Setting the key
+allows identical corpuses to be generated in two or more places.
+.RE
+.RE
+.PP
+.RS
+.B  [ -byte_list\ inputfilename ]
+.RS
+.PP
+This option sets byte values to be encrypted in the corpus as the
+bytes in the named input file.  Each corpus has a list of byte values
+that are encrypted.  By default all values that can be represented in
+one byte are coded.  Reducing the number of values reduces the size of
+the corpus and improves encryption.
+.RE
+.RE
+.PP
+.RS
+.B  [ -start_skip\ number ]
+.RS
+.PP
+Skip the first N calls to the random number generator.  Adding extra
+calls to the random number generator adds "randomness" to the corpus.
+.RE
+.RE
+.PP
+.RS
+.B  [ -skip\ number ]
+.RS
+.PP
+Skip adds extra calls to the random number generator prior to each
+call to the generator to retrieve a new byte for the corpus.
+.RE
+.RE
+.PP
+.RS
+.B  [ -skip_random ]
+.PP
+.RS
+Prior to each call to the random number generator, skip random sets
+the system to add extra calls to the random number generator.  The
+extra calls are determined by a call to the random number generator
+and a mask for -skip_rand_mask.
+.RE
+.RE
+.PP
+.RS
+.B  [ -skip_random_mask\ number ]
+.RS
+.PP
+This option sets the mask for -skip_random.  For example, setting this
+to one (i.e. 1) will result in zero or one being the resulting count.
+0377 will use all of the bits in the the first byte returned from the
+generator.  The resulting number is used as the count of the number of
+calls to the random number generator prior to each call to the
+generator to retrieve a new byte for the corpus.
+.RE
+.RE
+.PP
+.RS
+.B  [ -filter_file inputfilename ]
+.RS
+.PP
+This option sets the input filter file (bytes).  The filter file is
+another method for introducing randomness.  The bytes in the file are
+used to increase the number of calls to the random number generator
+prior to each call to the generator to retrieve a new byte for the
+corpus.
+.RE
+.RE
+.PP
+.RS
+.B  [ -filter_skip\ number ]
+.RS
+.PP
+This option Sets the number of bytes to be skipped at the start of the
+filter file.
+.RE
+.RE
+.PP
+.RS
+.B  [ -filter_mask\ number ]
+.RS
+.PP
+This option sets the mask to be used for bytes from the filter file.
+For example, setting this to one (i.e. 1) will result in zero or one
+being the byte read from the file.  0377 will use all of the bits in
+the bytes read from the file.  The resulting number is used as the
+count of the number of calls to the random number generator prior to
+each call to the generator to retrieve a new byte for the corpus.
+.RE
+.RE
+.PP
+.RE
+.PP
+
+.TP
+.B 4. etally inputfilename [ OPTIONS ]
+.PP
+.B etally
+extracts information from a specified input file.  One use is to
+provide a list of byte values, a byte list, for use in the ecorpus
+program.
+.B etally
+also prints out distribution statistics on the bytes in the input
+file.
+.PP
+.RS
+.B inputfilename
+.RS
+.PP
+This option sets the input filename from which the bytes (characters)
+will be counted and analyzed.
+.RE
+.RE
+.PP
+.RS
+.B  [ -start\ N ]
+.RS
+.PP
+This option causes the reading to start after the first N bytes in the
+input file.
+.RE
+.RE
+.PP
+.RS
+.B  [ -print_outliers ]
+.RS
+.PP
+This option causes the list of statistical outliers to be printed to
+standard output.
+.RE
+.RE
+.PP
+.RS
+.B  [ -stop_on_256 ]
+.RS
+.PP
+This option causes tabulating to stop when 256 values are found.
+.RE
+.RE
+.PP
+.RS
+.B  [ -print_bytes ]
+.RS
+.PP
+This option causes causes the list of the bytes found in the input
+file to be printed to a file.  The output is written to a file named
+using the input file name with ".tally" added to the end of the name.
+.RE
+.RE
+.PP
+
+.SH RETURN VALUE
+These programs all return 0 upon successful execution and return 1 upon
+failure.  Upon failure these programs specify the failure and list
+the program options.
+
+.SH CORPUS STREAMS
+Corpus streams may be used in place of corpus files for encryption and
+decryption.  Streams are denoted with the following syntax:
+.PP
+.RS
+.B stream:filename
+.RE
+.PP
+The syntax of the options in the file match the options found in the
+.B ecorpus
+program.  Each option is entered one per line.
+
+.EX
+  -uniform - sets byte values per block to be uniform and random
+  -key - sets the randomizing seed: -key number
+  -byte_list - specifies a file containing byte values: -byte_list file
+  -start_skip - skip the first N random numbers: -start_skip number
+  -skip - skip N random numbers on each call to random: -skip number
+  -skip_random - skip randomly at each call to random()
+  -skip_random_mask - bit mask for -skip_random: -skip_random_mask number
+  -filter_file - file of skip N random numbers: -filter_file filename
+  -filter_skip - bytes to skip in the filter file: -filter_skip number
+  -filter_mask - mask to be used for skip numbers: -filter_mask number
+.EE
+
+.SH COPYRIGHT
+These programs are all covered by the MIT License and can be freely
+distributed.  A copyright notice is included in every source file.
+
+.SH BUGS
+Corpus files wrap if the encryption or decryption process exceeds the
+length of the corpus.  This can be argued to be a feature or a bug.
+Corpus streams never wrap as they are essentially infinite.
+
+.SH NOTES
+This man page is for entertainment only.
+.\" Work around problems with some troff -man implementations.
+.br
+.
+.\" Format for Emacs-maintained Dt string defined at this file's start.
+.\" Local variables:
+.\" time-stamp-format: "%:y-%02m-%02d"
+.\" End:

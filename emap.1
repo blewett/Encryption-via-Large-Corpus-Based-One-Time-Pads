@@ -52,7 +52,8 @@ religious texts.  Ideal corpus files should be huge, random, and kept
 private.  They should also not be reused - create or select a new
 corpus for each encryption task.  Another less secure method is to
 change the starting index into the corpus.  This technique was used
-with ancient texts.
+with ancient texts.  One should always use an offset when using
+executable files as corpuses to avoid reused parts of the header.
 .PP
 This technique converts source bytes into
 .I relative indices

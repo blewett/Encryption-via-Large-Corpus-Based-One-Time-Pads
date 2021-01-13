@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
     unsigned char c;
     unsigned char c_corpus;
     off_t index_corpus;
+    off_t index_test;
     off_t distance_corpus;
 
     off_t count;
@@ -219,12 +220,18 @@ int main(int argc, char *argv[])
 
 	    if (c == c_corpus)
 	    {
-		distance_corpus = index_corpus2 - index_corpus;
-		index_corpus = index_corpus2;
-		if (redirect_stdin == false)
-		    i++;
-		wrapping = false;
-		break;
+		// do not replace with the same  byte
+		index_test = c;
+
+		if (index_test != (index_corpus2 - index_corpus))
+		{
+		    distance_corpus = index_corpus2 - index_corpus;
+		    index_corpus = index_corpus2;
+		    if (redirect_stdin == false)
+			i++;
+		    wrapping = false;
+		    break;
+		}
 	    }
 	}
 

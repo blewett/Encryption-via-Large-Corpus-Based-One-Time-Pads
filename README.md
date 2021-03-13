@@ -10,7 +10,7 @@ The programs in this group include:
 ```
 This is a collection of simple software tools that can be used to perform large corpus based encryption in a style that is called "one time pads".
 ```
-https://en.wikipedia.org/wiki/One-time_pad
+   https://en.wikipedia.org/wiki/One-time_pad
 ```
 
 Here is a couple line description of corpus based encryption.  Source file bytes are converted into relative indices of a corpus file.  For example, the source letter "A" may be converted the number 23 if the next "A" in the corpus files is 23 bytes from the current location.  A subsequent source "A" might be converted to 180 if the next "A" is 180 bytes from the current location in the corpus file.
